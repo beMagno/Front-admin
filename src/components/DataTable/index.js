@@ -1,5 +1,3 @@
-// src/components/DataTable.js
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { DataGrid } from '@mui/x-data-grid';
@@ -8,14 +6,18 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const DataTable = ({ data, columns, loading, onEdit, onView }) => {
-  // Funções de ação para editar e visualizar
+const DataTable = ({ data, columns, loading, onEdit, onView, onDelete }) => {
+  // Funções de ação para editar, visualizar e deletar
   const handleEditClick = (row) => {
     onEdit(row);
   };
 
   const handleViewClick = (row) => {
     onView(row);
+  };
+
+  const handleDeleteClick = (row) => {
+    onDelete(row.id); // Passa o ID do anúncio para a função onDelete
   };
 
   const columnsWithActions = [
@@ -33,7 +35,7 @@ const DataTable = ({ data, columns, loading, onEdit, onView }) => {
           <IconButton onClick={() => handleEditClick(params.row)} aria-label="edit">
             <EditIcon />
           </IconButton>
-          <IconButton aria-label="delete">
+          <IconButton onClick={() => handleDeleteClick(params.row)} aria-label="delete">
             <DeleteIcon />
           </IconButton>
         </div>
@@ -60,6 +62,7 @@ DataTable.propTypes = {
   loading: PropTypes.bool.isRequired,
   onEdit: PropTypes.func.isRequired,
   onView: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired, // Adicione a propriedade onDelete
 };
 
 export default DataTable;

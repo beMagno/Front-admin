@@ -1,137 +1,132 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import DataTable from '../../components/DataTable';
 import GenericModal from '../../components/Modals/GenericModal';
 import GenericForm from '../../components/Forms/GenericForm';
 import tableConfigs from '../../components/DataTable/DataTableConfig';
 import formConfigs from '../../components/Forms/FormConfig';
 import useFetchData from '../../hooks/useFetchData';
-    import axios from 'axios';
-import * as ReactDOM from 'react-dom';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const Announcements = () => {
-    const { data, error, loading, fetchData } = useFetchData(tableConfigs.announcements.apiUrl);
-    const [viewModalOpen, setViewModalOpen] = useState(false);
-    const [editModalOpen, setEditModalOpen] = useState(false);
-    const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
-    const [formValues, setFormValues] = useState({});
-    const [bannerFile, setBannerFile] = useState(null);
-    const [bannerUrl, setBannerUrl] = useState('');
+  const { data, error, loading, refetchData } = useFetchData(tableConfigs.announcements.apiUrl);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [bannerUrl, setBannerUrl] = useState('');
 
-    const handleCloseModals = () => {
-        setViewModalOpen(false);
-        setEditModalOpen(false);
-        setFormValues({});
-        setBannerFile(null);
-        setBannerUrl('');
-    };
+  const methods = useForm();
 
-    const handleEdit = (announcement) => {
-        setSelectedAnnouncement(announcement);
-        setFormValues({
-            ...announcement,
-            announcement_type: announcement.announcement_type || 'EVENTO',
-            status: announcement.status || 'Inativo'
-        });
-        setBannerUrl(announcement.Banner || '');
-        setEditModalOpen(true);
-    };
+  const handleCloseModals = () => {
+    setViewModalOpen(false);
+    setEditModalOpen(false);
+    methods.reset();
+    setBannerUrl('');
+  };
 
-    const handleView = (announcement) => {
-        setSelectedAnnouncement(announcement);
-        setViewModalOpen(true);
-    };
+  const handleEdit = (announcement) => {
+    setSelectedAnnouncement(announcement);
+    methods.reset(announcement);
+    setBannerUrl(announcement.Banner || '');
+    setEditModalOpen(true);
+  };
 
-    const handleChange = (e) => {
-        const { id, value, checked, type } = e.target;
-        console.log(e.target)
-        setFormValues(prevState => ({
-            ...prevState,
-            [id]: type === 'checkbox' ? checked : value
-        }));
-    };
+  const handleView = (announcement) => {
+    setSelectedAnnouncement(announcement);
+    setViewModalOpen(true);
+  };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setBannerFile(file);
-        setBannerUrl(URL.createObjectURL(file)); // Mostrar a pré-visualização do novo arquivo selecionado
-    };
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    methods.setValue('Banner', file);
+    setBannerUrl(URL.createObjectURL(file));
+  };
 
-    const handleSave = () => {
-        const formData = new FormData();
-        for (const key in formValues) {
-            formData.append(key, formValues[key]);
+  const onSubmit = async (formData) => {
+    try {
+      const dataToSend = new FormData();
+      for (const key in formData) {
+        dataToSend.append(key, formData[key]);
+      }
+
+      const response = await axios.put(`${tableConfigs.announcements.apiUrl}${formData.id}/`, dataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-        if (bannerFile) {
-            formData.append('Banner', bannerFile);
-        } else if (bannerUrl) {
-            formData.append('BannerUrl', bannerUrl);
-        }
+      });
 
-        axios.put(`${tableConfigs.announcements.apiUrl}${formValues.id}/`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
-        .then(response => {
-            console.log('Dados editados com sucesso:', response.data);
-            handleCloseModals();
-            fetchData();
-            toast.success('Anúncio editado com sucesso!');
-        })
-        .catch(error => {
-            console.error('Erro ao editar:', error);
-            if (error.response && error.response.data) {
-                console.error('Detalhes do erro:', error.response.data);
-                toast.error('Erro ao editar: ' + JSON.stringify(error.response.data));
-            }
-        });
-    };
+      console.log('Dados editados com sucesso:', response.data);
+      handleCloseModals();
+      refetchData(); // Recarrega os dados após a edição
+      toast.success('Anúncio editado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao editar:', error);
+      if (error.response && error.response.data) {
+        const errorMessage = typeof error.response.data === 'string' 
+          ? error.response.data 
+          : Object.values(error.response.data).flat().join(', ');
+        toast.error(`Erro ao editar: ${errorMessage}`);
+      } else {
+        toast.error('Erro ao editar. Por favor, tente novamente.');
+      }
+    }
+  };
 
-    return (
+  const onDelete = async (id) => {
+    if (window.confirm('Tem certeza que deseja deletar este anúncio?')) {
+      try {
+        await axios.delete(`${tableConfigs.announcements.apiUrl}${id}/`);
+        toast.success('Anúncio deletado com sucesso!');
+        refetchData(); // Recarrega os dados após a deleção
+      } catch (error) {
+        console.error('Erro ao deletar:', error);
+        toast.error('Erro ao deletar. Por favor, tente novamente.');
+      }
+    }
+  };
+
+  return (
+    <div>
+      <DataTable
+        data={data}
+        columns={tableConfigs.announcements.columns}
+        loading={loading}
+        onEdit={handleEdit}
+        onView={handleView}
+        onDelete={onDelete} // Passando função onDelete para a DataTable
+      />
+      <GenericModal
+        open={editModalOpen}
+        handleClose={handleCloseModals}
+        title="Editar Anúncio"
+        handleSave={methods.handleSubmit(onSubmit)}
+      >
+        <FormProvider {...methods}>
+          <GenericForm
+            config={formConfigs.announcements}
+            values={methods.getValues()}
+            handleFileChange={handleFileChange}
+          />
+        </FormProvider>
+      </GenericModal>
+      <GenericModal
+        open={viewModalOpen}
+        handleClose={handleCloseModals}
+        title="Visualizar Anúncio"
+      >
         <div>
-            <DataTable
-                data={data}
-                columns={tableConfigs.announcements.columns}
-                loading={loading}
-                onEdit={handleEdit}
-                onView={handleView}
-            />
-            <GenericModal
-                open={editModalOpen}
-                handleClose={handleCloseModals}
-                title="Editar Anúncio"
-                handleSave={handleSave}
-            >
-                <GenericForm
-                    config={formConfigs.announcements}
-                    values={formValues}
-                    handleChange={handleChange}
-                    handleFileChange={handleFileChange}
-                />
-                {bannerUrl && (
-                    <div>
-                        <img src={bannerUrl} alt="Banner atual" style={{ maxWidth: '100%', height: 'auto' }} />
-                    </div>
-                )}
-            </GenericModal>
-            <GenericModal
-                open={viewModalOpen}
-                handleClose={handleCloseModals}
-                title="Visualizar Anúncio"
-            >
-                <div style={{ maxWidth: '100%', height: 'auto', overflow: 'auto' }}>
-                    <p><strong>Título:</strong> {selectedAnnouncement?.title}</p>
-                    <p><strong>Descrição:</strong> {selectedAnnouncement?.description}</p>
-                    <p><strong>Mensagem:</strong> <span dangerouslySetInnerHTML={{ __html: selectedAnnouncement?.message }} /></p>
-                    <p><strong>Tipo:</strong> {selectedAnnouncement?.announcement_type}</p>
-                    <p><strong>Fixar:</strong> {selectedAnnouncement?.pin ? 'Sim' : 'Não'}</p>
-                    <p><strong>Status:</strong> {selectedAnnouncement?.status}</p>
-                    <p><strong>Banner:</strong> <img src={selectedAnnouncement?.Banner} alt="Banner" style={{ maxWidth: '100%', height: 'auto' }} /></p>
-                </div>
-            </GenericModal>
+          <p><strong>Título:</strong> {selectedAnnouncement?.title}</p>
+          <p><strong>Descrição:</strong> {selectedAnnouncement?.description}</p>
+          <p><strong>Mensagem:</strong> <span style={{ maxWidth: '100%', height: 'auto', display: 'block' }} dangerouslySetInnerHTML={{ __html: selectedAnnouncement?.message }} /></p>
+          <p><strong>Tipo:</strong> {selectedAnnouncement?.announcement_type}</p>
+          <p><strong>Fixar:</strong> {selectedAnnouncement?.pin ? 'Sim' : 'Não'}</p>
+          <p><strong>Status:</strong> {selectedAnnouncement?.status}</p>
+          <p><strong>Banner:</strong> <img src={selectedAnnouncement?.Banner} alt="Banner" style={{ maxWidth: '100%', height: 'auto' }} /></p>
         </div>
-    );
+      </GenericModal>
+    </div>
+  );
 };
 
 export default Announcements;
