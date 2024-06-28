@@ -8,7 +8,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const GenericForm = ({ config, values, handleFileChange }) => {
+const GenericForm = ({ config,  handleFileChange }) => {
+    console.log("handleFileChange prop:", handleFileChange);
     const { control, setValue, formState: { errors } } = useFormContext();
 
     const handleQuillChange = (id, value) => {
@@ -98,7 +99,7 @@ const GenericForm = ({ config, values, handleFileChange }) => {
                                 )}
                             />
                         );
-                    case 'file':
+                    case 'file':    
                         return (
                             <Controller
                                 key={field.id}

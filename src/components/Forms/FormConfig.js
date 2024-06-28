@@ -16,6 +16,16 @@ const formConfigs = {
             { id: 'Banner', label: 'Banner', type: 'file', required: false },
         ],
     },
+    faq: {
+        fields: [
+            { id: 'question', label: 'Pergunta', type: 'text', required: true },
+            { id: 'answer', label: 'Resposta', type: 'textarea', required: true },
+            { id: 'employment_type', label: 'Tipo', type: 'select', options: [
+                { value: 'CLT', label: 'CLT' },
+                { value: 'PJ', label: 'PJ' }
+            ], required: true },
+        ],
+    },
     // Outras configurações de formulário...
 };
 

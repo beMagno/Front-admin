@@ -11,12 +11,11 @@ const tableConfigs = {
         ]
     },
     faq: {
-        apiUrl: "https://portal-dev.teclat.dev/api/faq/",
+        apiUrl: "https://portal-dev.teclat.dev/api/perguntas/",
         columns: [
-            { field: 'question', headerName: 'Pergunta', width: 200 },
+            { field: 'question', headerName: 'Pergunta', width: 300 },
             { field: 'answer', headerName: 'Resposta', width: 400 },
-            { field: 'status', headerName: 'Status' },
-            { field: 'actions', headerName: 'Ações', width: 150 }
+            { field: 'employment_type', headerName: 'Tipo' },
         ]
     },
     // Adicione outras configurações conforme necessário

@@ -8,6 +8,7 @@ import formConfigs from '../../components/Forms/FormConfig';
 import useFetchData from '../../hooks/useFetchData';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import CreateButton from '../../components/CreateButton/index';
 
 const Announcements = () => {
   const { data, error, loading, refetchData } = useFetchData(tableConfigs.announcements.apiUrl);
@@ -19,7 +20,7 @@ const Announcements = () => {
   const methods = useForm();
 
   const handleCloseModals = () => {
-    setViewModalOpen(false);
+    setViewModalOpen(false);  
     setEditModalOpen(false);
     methods.reset();
     setBannerUrl('');
@@ -58,8 +59,8 @@ const Announcements = () => {
 
       console.log('Dados editados com sucesso:', response.data);
       handleCloseModals();
-      refetchData(); // Recarrega os dados após a edição
-      toast.success('Anúncio editado com sucesso!');
+      refetchData(); 
+      toast.success('Comunicado editado com sucesso!');
     } catch (error) {
       console.error('Erro ao editar:', error);
       if (error.response && error.response.data) {
@@ -74,10 +75,10 @@ const Announcements = () => {
   };
 
   const onDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja deletar este anúncio?')) {
+    if (window.confirm('Tem certeza que deseja deletar este Comunicado?')) {
       try {
         await axios.delete(`${tableConfigs.announcements.apiUrl}${id}/`);
-        toast.success('Anúncio deletado com sucesso!');
+        toast.success('Comunicado deletado com sucesso!');
         refetchData(); // Recarrega os dados após a deleção
       } catch (error) {
         console.error('Erro ao deletar:', error);
@@ -88,20 +89,54 @@ const Announcements = () => {
 
   return (
     <div>
+      <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", marginBottom:40}}>
+        <h1>Comunicados</h1>
+        <CreateButton 
+          title="Novo Comunicado" 
+          config={formConfigs.announcements} 
+          apiUrl={tableConfigs.announcements.apiUrl}
+          refetchData={refetchData} 
+        />
+      </div>
+      {/* Tabela de Dados */}
       <DataTable
         data={data}
         columns={tableConfigs.announcements.columns}
         loading={loading}
         onEdit={handleEdit}
         onView={handleView}
-        onDelete={onDelete} // Passando função onDelete para a DataTable
+        onDelete={onDelete} 
       />
+
+      {/* Modal de Visualização */}
+      <GenericModal
+        open={viewModalOpen}
+        handleClose={handleCloseModals}
+        title="Visualizar Comunicado"
+      >
+        {/* Conteúdo do modal de visualização */}
+        {selectedAnnouncement &&(
+          <div>
+            <p><strong>Título:</strong> {selectedAnnouncement?.title}</p>
+            <p><strong>Descrição:</strong> {selectedAnnouncement?.description}</p>
+            <p><strong>Mensagem:</strong> <span style={{ maxWidth: '100%', height: 'auto', display: 'block' }} dangerouslySetInnerHTML={{ __html: selectedAnnouncement?.message }} /></p>
+            <p><strong>Tipo:</strong> {selectedAnnouncement?.announcement_type}</p>
+            <p><strong>Fixar:</strong> {selectedAnnouncement?.pin ? 'Sim' : 'Não'}</p>
+            <p><strong>Status:</strong> {selectedAnnouncement?.status}</p>
+            <p><strong>Banner:</strong> <img src={selectedAnnouncement?.Banner} alt="Banner" style={{ maxWidth: '100%', height: 'auto' }} /></p>
+          </div>
+        )}
+      </GenericModal>
+
+      {/* Modal de Edição */}
       <GenericModal
         open={editModalOpen}
         handleClose={handleCloseModals}
-        title="Editar Anúncio"
+        title="Editar Comunicado"
         handleSave={methods.handleSubmit(onSubmit)}
       >
+        {/* Formulário de edição */}
+        {selectedAnnouncement &&(
         <FormProvider {...methods}>
           <GenericForm
             config={formConfigs.announcements}
@@ -109,21 +144,7 @@ const Announcements = () => {
             handleFileChange={handleFileChange}
           />
         </FormProvider>
-      </GenericModal>
-      <GenericModal
-        open={viewModalOpen}
-        handleClose={handleCloseModals}
-        title="Visualizar Anúncio"
-      >
-        <div>
-          <p><strong>Título:</strong> {selectedAnnouncement?.title}</p>
-          <p><strong>Descrição:</strong> {selectedAnnouncement?.description}</p>
-          <p><strong>Mensagem:</strong> <span style={{ maxWidth: '100%', height: 'auto', display: 'block' }} dangerouslySetInnerHTML={{ __html: selectedAnnouncement?.message }} /></p>
-          <p><strong>Tipo:</strong> {selectedAnnouncement?.announcement_type}</p>
-          <p><strong>Fixar:</strong> {selectedAnnouncement?.pin ? 'Sim' : 'Não'}</p>
-          <p><strong>Status:</strong> {selectedAnnouncement?.status}</p>
-          <p><strong>Banner:</strong> <img src={selectedAnnouncement?.Banner} alt="Banner" style={{ maxWidth: '100%', height: 'auto' }} /></p>
-        </div>
+        )}
       </GenericModal>
     </div>
   );

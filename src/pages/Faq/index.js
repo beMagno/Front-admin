@@ -1,24 +1,146 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 import DataTable from '../../components/DataTable';
-
-const columns = [
-  {
-    field: 'question',
-    headerName: 'Perguntas',
-    width: 500,
-  },
-  {
-    field: 'employment_type',
-    headerName: 'Tipo',
-    width: 120,
-  },
-]
+import useFetchData from '../../hooks/useFetchData';
+import GenericModal from '../../components/Modals/GenericModal';
+import GenericForm from '../../components/Forms/GenericForm';
+import tableConfigs from '../../components/DataTable/DataTableConfig';
+import formConfigs from '../../components/Forms/FormConfig';
+import axios from 'axios';
+import CreateButton from '../../components/CreateButton';
+import { toast } from 'react-toastify';
 
 const FAQ = () => {
+  // Hook para buscar dados e gerenciar estados de carregamento e erro
+  const { data, loading, error, refetchData } = useFetchData(tableConfigs.faq.apiUrl);
+
+  // Estados para controlar a abertura dos modais e o item selecionado
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedFAQ, setSelectedFAQ] = useState(null);
+
+  // Hook para gerenciamento de formulário
+  const methods = useForm();
+
+  // Função para fechar os modais e resetar o formulário
+  const handleCloseModals = () => {
+    setViewModalOpen(false);
+    setEditModalOpen(false);
+    methods.reset();
+  };
+
+  // Função para abrir o modal de edição com os dados do FAQ selecionado
+  const handleEdit = (faq) => {
+    setSelectedFAQ(faq);
+    methods.reset(faq);
+    setEditModalOpen(true);
+  };
+
+  // Função para abrir o modal de visualização com os dados do FAQ selecionado
+  const handleView = (faq) => {
+    setSelectedFAQ(faq);
+    setViewModalOpen(true);
+  };
+
+  // Função para enviar os dados do formulário e editar o FAQ
+  const onSubmit = async (formData) => {
+    try {
+      const dataToSend = new FormData();
+      for (const key in formData) {
+        dataToSend.append(key, formData[key]);
+      }
+
+      const response = await axios.put(`${tableConfigs.faq.apiUrl}${formData.id}/`, dataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log('Dados editados com sucesso:', response.data);
+      handleCloseModals();
+      refetchData(); 
+      toast.success('Pergunta editada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao editar:', error);
+      if (error.response && error.response.data) {
+        const errorMessage = typeof error.response.data === 'string' 
+          ? error.response.data 
+          : Object.values(error.response.data).flat().join(', ');
+        toast.error(`Erro ao editar: ${errorMessage}`);
+      } else {
+        toast.error('Erro ao editar. Por favor, tente novamente.');
+      }
+    }
+  };
+
+  // Função para excluir o FAQ selecionado
+  const onDelete = async (id) => {
+    if (window.confirm('Tem certeza que deseja deletar esta pergunta?')) {
+      try {
+        await axios.delete(`${tableConfigs.faq.apiUrl}${id}/`);
+        toast.success('Pergunta deletada com sucesso!');
+        refetchData(); 
+      } catch (error) {
+        console.error('Erro ao deletar:', error);
+        toast.error('Erro ao deletar. Por favor, tente novamente.');
+      }
+    }
+  };
+
   return (
     <div>
-      <h1>FAQ</h1>
-      <DataTable apiUrl='https://portal-dev.teclat.dev/api/perguntas/' columns={columns}/>
+      <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", marginBottom:40}}>
+        <h1>FAQ</h1>
+        <CreateButton 
+          title="Nova Pergunta" 
+          config={formConfigs.faq} 
+          apiUrl={tableConfigs.faq.apiUrl}
+          refetchData={refetchData} 
+        />
+      </div>
+      {/* Tabela de Dados */}
+      <DataTable
+        data={data}
+        columns={tableConfigs.faq.columns}
+        loading={loading}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDelete={onDelete}
+      />
+
+      {/* Modal de Visualização */}
+      <GenericModal
+        open={viewModalOpen}
+        handleClose={handleCloseModals}
+        title="Visualizar Pergunta"
+      >
+        {/* Conteúdo do modal de visualização */}
+        {selectedFAQ && (
+          <div>
+            <p><strong>Pergunta:</strong> {selectedFAQ.question}</p>
+            <p><strong>Resposta:</strong> {selectedFAQ.answer}</p>
+            <p><strong>Tipo:</strong> {selectedFAQ.employment_type}</p>
+          </div>
+        )}
+      </GenericModal>
+
+      {/* Modal de Edição */}
+      <GenericModal
+        open={editModalOpen}
+        handleClose={handleCloseModals}
+        title="Editar pergunta"
+        handleSave={methods.handleSubmit(onSubmit)}
+      >
+        {/* Formulário de edição */}
+        {selectedFAQ && (
+          <FormProvider {...methods}>
+            <GenericForm
+              config={formConfigs.faq}
+              values={selectedFAQ}
+            />
+          </FormProvider>
+        )}
+      </GenericModal>
     </div>
   );
 };

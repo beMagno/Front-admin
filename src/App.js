@@ -12,11 +12,14 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const AppContainer = styled.div`
   display: flex;
+  padding: 40px;
+  overflow-x: hidden;
 `;
 
 const Content = styled.div`
   flex: 1;
-  padding: 20px;
+  padding: 40px;
+  max-width: 100%;
 `;
 
 const App = () => {
