@@ -9,12 +9,14 @@ import useFetchData from '../../hooks/useFetchData';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import CreateButton from '../../components/CreateButton/index';
+import SaveButton from '../../components/SaveButton';
 
 const Announcements = () => {
   const { data, error, loading, refetchData } = useFetchData(tableConfigs.announcements.apiUrl);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [editedRows, setEditedRows] = useState([]);
   const [bannerUrl, setBannerUrl] = useState('');
 
   const methods = useForm();
@@ -87,10 +89,28 @@ const Announcements = () => {
     }
   };
 
+  const handleEditCellChangeCommitted = (params) => {
+    const { id, field, value } = params;
+    setEditedRows((prev) => {
+      const existingRow = prev.find((row) => row.id === id);
+      if (existingRow) {
+        return prev.map((row) => row.id === id ? { ...row, [field]: value } : row);
+      } else {
+        return [...prev, { id, [field]: value }];
+      }
+    });
+  console.log(editedRows)
+  };
+
   return (
     <div>
-      <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", marginBottom:40}}>
-        <h1>Comunicados</h1>
+      <h1>Comunicados</h1>
+      <div style={{display:"flex", flexDirection:"row", gap:30,  marginBottom:20, marginTop:20}}>
+        <SaveButton
+          editedRows={editedRows}
+          apiUrl={tableConfigs.announcements.apiUrl}
+          refetchData={refetchData}
+        />
         <CreateButton 
           title="Novo Comunicado" 
           config={formConfigs.announcements} 
@@ -106,6 +126,7 @@ const Announcements = () => {
         onEdit={handleEdit}
         onView={handleView}
         onDelete={onDelete} 
+        onEditCellChangeCommitted={handleEditCellChangeCommitted}
       />
 
       {/* Modal de Visualização */}

@@ -9,6 +9,7 @@ import MyRh from './pages/MyRh';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Login from './pages/Login';
 
 const AppContainer = styled.div`
   display: flex;
@@ -19,7 +20,8 @@ const AppContainer = styled.div`
 const Content = styled.div`
   flex: 1;
   padding: 40px;
-  max-width: 100%;
+  margin-left: 220px; /* Largura da sidebar + um pouco de espaçamento */
+  max-width: calc(100% - 220px); /* Para garantir que o conteúdo não ultrapasse a tela */
 `;
 
 const App = () => {
@@ -33,6 +35,7 @@ const App = () => {
             <Route path="/comunicados" element={<Announcements />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/meurh" element={<MyRh />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </Content>
       </AppContainer>

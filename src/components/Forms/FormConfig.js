@@ -26,6 +26,24 @@ const formConfigs = {
             ], required: true },
         ],
     },
+    benefits: {
+        fields: [
+            { id: 'name', label: 'Nome', type: 'text', required: true },
+            { id: 'description', label: 'Descrição', type: 'textarea', required: true },
+            { id: 'banner', label: 'Banner', type: 'file', required: false },
+        ],
+    },
+    documents: {
+        fields: [
+            { id: 'title', label: 'Título', type: 'text', required: true },
+            { id: 'description', label: 'Descrição', type: 'textarea', required: true },
+            { id: 'employment_type', label: 'Tipo', type: 'select', options: [
+                { value: 'CLT', label: 'CLT' },
+                { value: 'PJ', label: 'PJ' }
+            ], required: true },
+            { id: 'file', label: 'Arquivo', type: 'file', required: false },
+        ],
+    },
     // Outras configurações de formulário...
 };
 

@@ -2,14 +2,15 @@ import styled from 'styled-components';
 
 export const SidebarContainer = styled.div`
   width: 200px;
-  height: 90vh;
+  height: 85vh;
   background-color: #f4f4f4;
   border-radius: 20px;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  position: fixed;
   margin-left: 20px;
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: 10px;
+  margin-bottom: 40px;
 `;
 
 export const LogoContainer = styled.div`

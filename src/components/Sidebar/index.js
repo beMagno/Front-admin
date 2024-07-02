@@ -16,6 +16,13 @@ const Sidebar = () => {
       <LogoContainer>
         <img src={Logo} alt="Logo" className='logo'/>
       </LogoContainer>
+      {/* ------------------------------------------------- */}
+      <SidebarLink as={Link} to="/login">
+        <HomeIcon  sx={iconStyle}/>
+        Login
+      </SidebarLink>
+      {/* ------------------------------------------------- */}
+
       <SidebarLink as={Link} to="/">
         <HomeIcon  sx={iconStyle}/>
         Home

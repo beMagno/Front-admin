@@ -1,11 +1,13 @@
-  import React from 'react';
+import React from 'react';
+import Benefits from '../../components/MyRh/Benefits';
+import Documents from '../../components/MyRh/Documents';
 
   const MyRh = () => {
     return (
       <div>
-        <h1>Meu RH</h1>
-        <h2>Documentos</h2>
-        <h2>Benefícios</h2>
+        <h1 style={{marginBottom:30}}>Meu RH</h1>
+        <Benefits/>
+        <Documents/>
       </div>
     );
   };
