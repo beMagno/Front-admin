@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider,SubmitHandler } from 'react-hook-form';
 import DataTable from '../../components/DataTable';
 import useFetchData from '../../hooks/useFetchData';
 import GenericModal from '../../components/Modals/GenericModal';
@@ -9,18 +9,25 @@ import formConfigs from '../../components/Forms/FormConfig';
 import axios from 'axios';
 import CreateButton from '../../components/CreateButton';
 import { toast } from 'react-toastify';
+import { GridValidRowModel } from '@mui/x-data-grid';
 
-const FAQ = () => {
+interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  employment_type: string;
+}
+
+const FAQ: React.FC = () => {
   // Hook para buscar dados e gerenciar estados de carregamento e erro
   const { data, loading, error, refetchData } = useFetchData(tableConfigs.faq.apiUrl);
 
   // Estados para controlar a abertura dos modais e o item selecionado
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedFAQ, setSelectedFAQ] = useState(null);
-
+  const [selectedFAQ, setSelectedFAQ] = useState<Faq | null>(null);
   // Hook para gerenciamento de formulário
-  const methods = useForm();
+  const methods = useForm<Faq>();
 
   // Função para fechar os modais e resetar o formulário
   const handleCloseModals = () => {
@@ -30,24 +37,24 @@ const FAQ = () => {
   };
 
   // Função para abrir o modal de edição com os dados do FAQ selecionado
-  const handleEdit = (faq) => {
+  const handleEdit = (faq: Faq) => {
     setSelectedFAQ(faq);
     methods.reset(faq);
     setEditModalOpen(true);
   };
 
   // Função para abrir o modal de visualização com os dados do FAQ selecionado
-  const handleView = (faq) => {
+  const handleView = (faq: Faq) => {
     setSelectedFAQ(faq);
     setViewModalOpen(true);
   };
 
   // Função para enviar os dados do formulário e editar o FAQ
-  const onSubmit = async (formData) => {
+  const onSubmit: SubmitHandler<Faq> = async (formData) => {
     try {
       const dataToSend = new FormData();
       for (const key in formData) {
-        dataToSend.append(key, formData[key]);
+        dataToSend.append(key, (formData as any)[key]);
       }
 
       const response = await axios.put(`${tableConfigs.faq.apiUrl}${formData.id}/`, dataToSend, {
@@ -60,7 +67,7 @@ const FAQ = () => {
       handleCloseModals();
       refetchData(); 
       toast.success('Pergunta editada com sucesso!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao editar:', error);
       if (error.response && error.response.data) {
         const errorMessage = typeof error.response.data === 'string' 
@@ -74,7 +81,7 @@ const FAQ = () => {
   };
 
   // Função para excluir o FAQ selecionado
-  const onDelete = async (id) => {
+  const onDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja deletar esta pergunta?')) {
       try {
         await axios.delete(`${tableConfigs.faq.apiUrl}${id}/`);
@@ -100,7 +107,7 @@ const FAQ = () => {
       </div>
       {/* Tabela de Dados */}
       <DataTable
-        data={data}
+        data={data as GridValidRowModel[]}
         columns={tableConfigs.faq.columns}
         loading={loading}
         onView={handleView}

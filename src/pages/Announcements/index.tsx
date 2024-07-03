@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import DataTable from '../../components/DataTable';
 import GenericModal from '../../components/Modals/GenericModal';
 import GenericForm from '../../components/Forms/GenericForm';
@@ -10,47 +10,61 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import CreateButton from '../../components/CreateButton/index';
 import SaveButton from '../../components/SaveButton';
+import { GridValidRowModel } from '@mui/x-data-grid';
 
-const Announcements = () => {
+interface Announcement {
+  id: number;
+  title: string;
+  description: string;
+  message: string;
+  announcement_type: string;
+  pin: boolean;
+  status: string;
+  Banner?: string;
+}
+
+const Announcements: React.FC = () => {
   const { data, error, loading, refetchData } = useFetchData(tableConfigs.announcements.apiUrl);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
-  const [editedRows, setEditedRows] = useState([]);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
   const [bannerUrl, setBannerUrl] = useState('');
+  const [editedRows, setEditedRows] = useState<any[]>([]);
 
-  const methods = useForm();
+  const methods = useForm<Announcement>();
 
   const handleCloseModals = () => {
-    setViewModalOpen(false);  
+    setViewModalOpen(false);
     setEditModalOpen(false);
     methods.reset();
     setBannerUrl('');
   };
 
-  const handleEdit = (announcement) => {
+  const handleEdit = (announcement: Announcement) => {
     setSelectedAnnouncement(announcement);
     methods.reset(announcement);
     setBannerUrl(announcement.Banner || '');
     setEditModalOpen(true);
   };
 
-  const handleView = (announcement) => {
+  const handleView = (announcement: Announcement) => {
     setSelectedAnnouncement(announcement);
     setViewModalOpen(true);
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    methods.setValue('Banner', file);
-    setBannerUrl(URL.createObjectURL(file));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      methods.setValue('Banner', file as any);
+      setBannerUrl(URL.createObjectURL(file));
+    }
   };
 
-  const onSubmit = async (formData) => {
+  const onSubmit: SubmitHandler<Announcement> = async (formData) => {
     try {
       const dataToSend = new FormData();
-      for (const key in formData) {
-        dataToSend.append(key, formData[key]);
+      for (const key of Object.keys(formData)) {
+        dataToSend.append(key, (formData as any)[key]);
       }
 
       const response = await axios.put(`${tableConfigs.announcements.apiUrl}${formData.id}/`, dataToSend, {
@@ -61,13 +75,13 @@ const Announcements = () => {
 
       console.log('Dados editados com sucesso:', response.data);
       handleCloseModals();
-      refetchData(); 
+      refetchData();
       toast.success('Comunicado editado com sucesso!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao editar:', error);
       if (error.response && error.response.data) {
-        const errorMessage = typeof error.response.data === 'string' 
-          ? error.response.data 
+        const errorMessage = typeof error.response.data === 'string'
+          ? error.response.data
           : Object.values(error.response.data).flat().join(', ');
         toast.error(`Erro ao editar: ${errorMessage}`);
       } else {
@@ -76,7 +90,7 @@ const Announcements = () => {
     }
   };
 
-  const onDelete = async (id) => {
+  const onDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja deletar este Comunicado?')) {
       try {
         await axios.delete(`${tableConfigs.announcements.apiUrl}${id}/`);
@@ -89,7 +103,7 @@ const Announcements = () => {
     }
   };
 
-  const handleEditCellChangeCommitted = (params) => {
+  const handleEditCellChangeCommitted = (params: any) => {
     const { id, field, value } = params;
     setEditedRows((prev) => {
       const existingRow = prev.find((row) => row.id === id);
@@ -99,34 +113,34 @@ const Announcements = () => {
         return [...prev, { id, [field]: value }];
       }
     });
-  console.log(editedRows)
+    console.log(editedRows);
   };
 
   return (
     <div>
       <h1>Comunicados</h1>
-      <div style={{display:"flex", flexDirection:"row", gap:30,  marginBottom:20, marginTop:20}}>
+      <div style={{ display: "flex", flexDirection: "row", gap: 30, marginBottom: 20, marginTop: 20 }}>
         <SaveButton
           editedRows={editedRows}
           apiUrl={tableConfigs.announcements.apiUrl}
           refetchData={refetchData}
         />
-        <CreateButton 
-          title="Novo Comunicado" 
-          config={formConfigs.announcements} 
+        <CreateButton
+          title="Novo Comunicado"
+          config={formConfigs.announcements}
           apiUrl={tableConfigs.announcements.apiUrl}
-          refetchData={refetchData} 
+          refetchData={refetchData}
         />
       </div>
       {/* Tabela de Dados */}
       <DataTable
-        data={data}
+         data={data as GridValidRowModel[]}
         columns={tableConfigs.announcements.columns}
         loading={loading}
         onEdit={handleEdit}
         onView={handleView}
-        onDelete={onDelete} 
-        onEditCellChangeCommitted={handleEditCellChangeCommitted}
+        onDelete={onDelete}
+        
       />
 
       {/* Modal de Visualização */}
@@ -136,7 +150,7 @@ const Announcements = () => {
         title="Visualizar Comunicado"
       >
         {/* Conteúdo do modal de visualização */}
-        {selectedAnnouncement &&(
+        {selectedAnnouncement && (
           <div>
             <p><strong>Título:</strong> {selectedAnnouncement?.title}</p>
             <p><strong>Descrição:</strong> {selectedAnnouncement?.description}</p>
@@ -157,18 +171,18 @@ const Announcements = () => {
         handleSave={methods.handleSubmit(onSubmit)}
       >
         {/* Formulário de edição */}
-        {selectedAnnouncement &&(
-        <FormProvider {...methods}>
-          <GenericForm
-            config={formConfigs.announcements}
-            values={methods.getValues()}
-            handleFileChange={handleFileChange}
-          />
-        </FormProvider>
+        {selectedAnnouncement && (
+          <FormProvider {...methods}>
+            <GenericForm
+              config={formConfigs.announcements}
+              values={methods.getValues()}
+              handleFileChange={handleFileChange}
+            />
+          </FormProvider>
         )}
       </GenericModal>
     </div>
-  );
+  );  
 };
 
 export default Announcements;

@@ -4,7 +4,13 @@ import SaveIcon from '@mui/icons-material/Save';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const SaveButton = ({ editedRows, apiUrl, refetchData }) => {
+interface SaveButtonProps {
+  editedRows: Array<{ id: number; [key: string]: any }>;
+  apiUrl: string;
+  refetchData: () => void;
+}
+
+const SaveButton: React.FC<SaveButtonProps> = ({ editedRows, apiUrl, refetchData }) => {
   const handleSave = async () => {
     try {
       const updateRequests = editedRows.map(async (row) => {

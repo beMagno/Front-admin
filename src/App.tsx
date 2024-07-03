@@ -31,7 +31,7 @@ const App = () => {
         <Sidebar />
         <Content>
           <Routes>
-            <Route exact path="/" element={<Home />} />
+            <Route path="/" element={<Home />} />
             <Route path="/comunicados" element={<Announcements />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/meurh" element={<MyRh />} />

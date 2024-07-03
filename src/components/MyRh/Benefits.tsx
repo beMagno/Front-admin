@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, SubmitHandler, FieldValues } from 'react-hook-form';
 import DataTable from '../DataTable';
 import GenericModal from '../Modals/GenericModal';
 import GenericForm from '../Forms/GenericForm';
@@ -9,41 +9,58 @@ import useFetchData from '../../hooks/useFetchData';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import CreateButton from '../CreateButton/index';
+import { GridValidRowModel } from '@mui/x-data-grid';
 
-const Documents = () => {
-  const { data, error, loading, refetchData } = useFetchData(tableConfigs.documents.apiUrl);
+interface Benefit {
+  id: number;
+  name: string;
+  description: string;
+  banner?: string;
+}
+
+const Benefits: React.FC  = () => {
+  const { data, error, loading, refetchData } = useFetchData(tableConfigs.benefits.apiUrl);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState(null);
-  
+  const [selectedBenefit, setSelectedBenefit] =useState<Benefit | null>(null);
+  const [bannerUrl, setBannerUrl] = useState('');
+
   const methods = useForm();
 
   const handleCloseModals = () => {
     setViewModalOpen(false);  
     setEditModalOpen(false);
     methods.reset();
-    
+    setBannerUrl('');
   };
 
-  const handleEdit = (document) => {
-    setSelectedDocument(document);
-    methods.reset(document);
+  const handleEdit = (benefit: Benefit) => {
+    setSelectedBenefit(benefit);
+    methods.reset(benefit);
+    setBannerUrl(benefit.banner || '');
     setEditModalOpen(true);
   };
 
-  const handleView = (document) => {
-    setSelectedDocument(document);
+  const handleView = (benefit: Benefit) => {
+    setSelectedBenefit(benefit);
     setViewModalOpen(true);
   };
 
-  const onSubmit = async (formData) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      methods.setValue('banner', file as any);
+      setBannerUrl(URL.createObjectURL(file));
+    }
+  };
+  const onSubmit: SubmitHandler<FieldValues> = async (formData) => {
     try {
       const dataToSend = new FormData();
       for (const key in formData) {
-        dataToSend.append(key, formData[key]);
+        dataToSend.append(key, (formData as any)[key]);
       }
 
-      const response = await axios.put(`${tableConfigs.documents.apiUrl}${formData.id}/`, dataToSend, {
+      const response = await axios.put(`${tableConfigs.benefits.apiUrl}${formData.id}/`, dataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -52,8 +69,8 @@ const Documents = () => {
       console.log('Dados editados com sucesso:', response.data);
       handleCloseModals();
       refetchData(); 
-      toast.success('Documento editado com sucesso!');
-    } catch (error) {
+      toast.success('Benefício editado com sucesso!');
+    } catch (error: any) {
       console.error('Erro ao editar:', error);
       if (error.response && error.response.data) {
         const errorMessage = typeof error.response.data === 'string' 
@@ -66,12 +83,12 @@ const Documents = () => {
     }
   };
 
-  const onDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja deletar este Documento?')) {
+  const onDelete = async (id: number) => {
+    if (window.confirm('Tem certeza que deseja deletar este Benefício?')) {
       try {
-        await axios.delete(`${tableConfigs.documents.apiUrl}${id}/`);
-        toast.success('Documento deletado com sucesso!');
-        refetchData(); 
+        await axios.delete(`${tableConfigs.benefits.apiUrl}${id}/`);
+        toast.success('Benefício deletado com sucesso!');
+        refetchData(); // Recarrega os dados após a deleção
       } catch (error) {
         console.error('Erro ao deletar:', error);
         toast.error('Erro ao deletar. Por favor, tente novamente.');
@@ -82,19 +99,19 @@ const Documents = () => {
 
   return (
     <div>
-      <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", marginBottom:40, marginTop:40}}>
-        <h2>Documentos</h2>
+      <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", marginBottom:40}}>
+        <h2>Benefícios</h2>
         <CreateButton 
-          title="Novo Documento" 
-          config={formConfigs.documents} 
-          apiUrl={tableConfigs.documents.apiUrl}
+          title="Novo Benefício" 
+          config={formConfigs.benefits} 
+          apiUrl={tableConfigs.benefits.apiUrl}
           refetchData={refetchData} 
         />
       </div>
       {/* Tabela de Dados */}
       <DataTable
-        data={data}
-        columns={tableConfigs.documents.columns}
+        data={data as GridValidRowModel[]}
+        columns={tableConfigs.benefits.columns}
         loading={loading}
         onEdit={handleEdit}
         onView={handleView}
@@ -105,15 +122,14 @@ const Documents = () => {
       <GenericModal
         open={viewModalOpen}
         handleClose={handleCloseModals}
-        title="Visualizar Documento"
+        title="Visualizar Benefício"
       >
         {/* Conteúdo do modal de visualização */}
-        {selectedDocument &&(
+        {selectedBenefit &&(
           <div>
-            <p><strong>Título:</strong> {selectedDocument?.title}</p>
-            <p><strong>Descrição:</strong> {selectedDocument?.description}</p>
-            <p><strong>Tipo:</strong> {selectedDocument.employment_type}</p>
-            <p><strong>Arquivo:</strong> {selectedDocument?.file}</p>
+            <p><strong>Nome:</strong> {selectedBenefit?.name}</p>
+            <p><strong>Descrição:</strong> {selectedBenefit?.description}</p>
+            <p><strong>Banner:</strong> <img src={selectedBenefit?.banner} alt="Banner" style={{ maxWidth: '100%', height: 'auto' }} /></p>
           </div>
         )}
       </GenericModal>
@@ -122,15 +138,16 @@ const Documents = () => {
       <GenericModal
         open={editModalOpen}
         handleClose={handleCloseModals}
-        title="Editar Documento"
+        title="Editar Benefício"
         handleSave={methods.handleSubmit(onSubmit)}
       >
         {/* Formulário de edição */}
-        {selectedDocument &&(
+        {selectedBenefit &&(
         <FormProvider {...methods}>
           <GenericForm
-            config={formConfigs.documents}
+            config={formConfigs.benefits}
             values={methods.getValues()}
+            handleFileChange={handleFileChange}
           />
         </FormProvider>
         )}
@@ -139,4 +156,4 @@ const Documents = () => {
   );
 };
 
-export default Documents;
+export default Benefits;

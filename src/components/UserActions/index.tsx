@@ -4,11 +4,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const UserActions = ({ row, handleEdit, handleView, handleDelete }) => {
+interface UserActionsProps {
+  row: any;
+  handleEdit: (row: any) => void;
+  handleView: (row: any) => void;
+  handleDelete: (row: any) => void; 
+}
+
+const UserActions: React.FC<UserActionsProps> = ({ row, handleEdit, handleView, handleDelete }) => {
   const handleEditClick = () => {
     handleEdit(row);
-  };  
-  
+  };
+
   const handleViewClick = () => {
     handleView(row);
   };
@@ -19,13 +26,13 @@ const UserActions = ({ row, handleEdit, handleView, handleDelete }) => {
 
   return (
     <div>
-      <IconButton onClick={handleEditClick}>
+      <IconButton onClick={handleEditClick} aria-label="Editar">
         <EditIcon />
       </IconButton>
-      <IconButton onClick={handleViewClick}>
+      <IconButton onClick={handleViewClick} aria-label="Visualizar">
         <VisibilityIcon />
       </IconButton>
-      <IconButton onClick={handleDeleteClick}>
+      <IconButton onClick={handleDeleteClick} aria-label="Excluir">
         <DeleteIcon />
       </IconButton>
     </div>

@@ -1,4 +1,16 @@
-const formConfigs = {
+interface FieldConfig {
+    id: string;
+    label: string;
+    type: 'text' | 'textarea' | 'select' | 'checkbox' | 'file'; // Tipos possíveis
+    required: boolean;
+    options?: { value: string; label: string }[]; // Apenas se o type for 'select'
+}
+
+interface FormConfig {
+    fields: FieldConfig[];
+}
+
+const formConfigs: Record<string, FormConfig> = {
     announcements: {
         fields: [
             { id: 'title', label: 'Título', type: 'text', required: true },
@@ -13,7 +25,7 @@ const formConfigs = {
                 { value: 'ATIVO', label: 'Ativo' },
                 { value: 'INATIVO', label: 'Inativo' }
             ], required: true },
-            { id: 'Banner', label: 'Banner', type: 'file', required: false },
+            { id: 'banner', label: 'Banner', type: 'file', required: false },
         ],
     },
     faq: {

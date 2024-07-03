@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { Button } from '@mui/material';
-import { useForm, FormProvider } from 'react-hook-form';
+import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import AddIcon from '@mui/icons-material/Add';
 import GenericModal from '../Modals/GenericModal';
 import GenericForm from '../Forms/GenericForm';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const CreateButton = ({ title, config, apiUrl, refetchData }) => {
+interface CreateButtonProps {
+  title: string;
+  config: any;  // Pode-se definir um tipo específico se o objeto de configuração for conhecido
+  apiUrl: string;
+  refetchData: () => void;
+}
+
+const CreateButton: React.FC<CreateButtonProps> = ({ title, config, apiUrl, refetchData }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const methods = useForm();
 
@@ -21,7 +28,11 @@ const CreateButton = ({ title, config, apiUrl, refetchData }) => {
     methods.reset();
   };
 
-  const onSubmit = async (formData) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Lógica para lidar com a mudança de arquivos
+  };
+
+  const onSubmit: SubmitHandler<any> = async (formData) => {
     try {
       const dataToSend = new FormData();
       for (const key in formData) {
@@ -38,7 +49,7 @@ const CreateButton = ({ title, config, apiUrl, refetchData }) => {
       handleCloseModal();
       refetchData();
       toast.success(`${title} criado com sucesso!`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao criar:', error);
       if (error.response && error.response.data) {
         const errorMessage = typeof error.response.data === 'string' 
@@ -69,7 +80,7 @@ const CreateButton = ({ title, config, apiUrl, refetchData }) => {
         handleSave={methods.handleSubmit(onSubmit)}
       >
         <FormProvider {...methods}>
-          <GenericForm config={config} />
+          <GenericForm config={config} values={methods.getValues()} handleFileChange={handleFileChange} />
         </FormProvider>
       </GenericModal>
     </>
