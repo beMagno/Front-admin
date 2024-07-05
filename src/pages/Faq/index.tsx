@@ -10,6 +10,7 @@ import axios from 'axios';
 import CreateButton from '../../components/CreateButton';
 import { toast } from 'react-toastify';
 import { GridValidRowModel } from '@mui/x-data-grid';
+import CircularProgress from '@mui/material/CircularProgress';
 
 interface Faq {
   id: number;
@@ -105,16 +106,22 @@ const FAQ: React.FC = () => {
           refetchData={refetchData} 
         />
       </div>
-      {/* Tabela de Dados */}
-      <DataTable
-        data={data as GridValidRowModel[]}
-        columns={tableConfigs.faq.columns}
-        loading={loading}
-        onView={handleView}
-        onEdit={handleEdit}
-        onDelete={onDelete}
-      />
 
+      {loading ? (
+        <CircularProgress />
+      ) : error ? (
+        <div>Error: {error.message}</div>
+      ) : (
+        // Tabela de dados
+        <DataTable
+          data={(data ?? []) as GridValidRowModel[]}
+          columns={tableConfigs.faq.columns}
+          loading={loading}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={onDelete}
+        />
+      )}
       {/* Modal de Visualização */}
       <GenericModal
         open={viewModalOpen}

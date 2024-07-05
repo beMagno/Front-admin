@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, Button, Typography, Box } from '@mui/material';
+import { Modal, Button, Typography } from '@mui/material';
+import { StyledModalBox, ModalActions, ModalTitle } from './style';
 
 interface GenericModalProps {
   open: boolean;
@@ -10,16 +11,16 @@ interface GenericModalProps {
 }
 
 const GenericModal: React.FC<GenericModalProps> = ({ open, handleClose, title, children, handleSave }) => {
-  return (
+  return (  
     <Modal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
-      <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, maxWidth: 600, width: '90%' }}>
-        <Typography variant="h5" component="h2" id="modal-title" sx={{ mb: 2 }}>
+      <StyledModalBox>
+        <ModalTitle id="modal-title">
           {title}
-        </Typography>
+        </ModalTitle>
         <Typography variant="body1" id="modal-description" sx={{ mb: 2 }}>
           {children}
         </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <ModalActions>
           {handleSave && (
             <Button variant="contained" onClick={handleSave} sx={{ mr: 2 }}>
               Save
@@ -28,8 +29,8 @@ const GenericModal: React.FC<GenericModalProps> = ({ open, handleClose, title, c
           <Button variant="outlined" onClick={handleClose}>
             Close
           </Button>
-        </Box>
-      </Box>
+        </ModalActions>
+      </StyledModalBox>
     </Modal>
   );
 };

@@ -10,18 +10,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Login from './pages/Login';
+import Topbar from './components/Topbar';
 
 const AppContainer = styled.div`
   display: flex;
-  padding: 40px;
+  padding-top: 40px;
   overflow-x: hidden;
 `;
 
 const Content = styled.div`
   flex: 1;
   padding: 40px;
-  margin-left: 220px; /* Largura da sidebar + um pouco de espaçamento */
-  max-width: calc(100% - 220px); /* Para garantir que o conteúdo não ultrapasse a tela */
+  margin-left: 240px; /* Largura da sidebar + um pouco de espaçamento */
+  max-width: calc(100% - 240px); /* Para garantir que o conteúdo não ultrapasse a tela */
 `;
 
 const App = () => {
@@ -29,6 +30,7 @@ const App = () => {
     <Router>
       <AppContainer>
         <Sidebar />
+        <Topbar />
         <Content>
           <Routes>
             <Route path="/" element={<Home />} />

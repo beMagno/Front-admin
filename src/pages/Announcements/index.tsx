@@ -10,9 +10,11 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import CreateButton from '../../components/CreateButton/index';
 import SaveButton from '../../components/SaveButton';
+import CircularProgress from '@mui/material/CircularProgress'
 import { GridValidRowModel } from '@mui/x-data-grid';
 
-interface Announcement {
+// Defina a interface para o tipo de dados esperado
+interface Announcement extends GridValidRowModel {
   id: number;
   title: string;
   description: string;
@@ -24,7 +26,10 @@ interface Announcement {
 }
 
 const Announcements: React.FC = () => {
-  const { data, error, loading, refetchData } = useFetchData(tableConfigs.announcements.apiUrl);
+  // Uso do hook para buscar dados
+  const { data, error, loading, refetchData } = useFetchData<Announcement[]>(tableConfigs.announcements.apiUrl);
+
+  // Estados para controlar modais e anúncios selecionados
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
@@ -33,6 +38,7 @@ const Announcements: React.FC = () => {
 
   const methods = useForm<Announcement>();
 
+  // Função para fechar modais e resetar estados
   const handleCloseModals = () => {
     setViewModalOpen(false);
     setEditModalOpen(false);
@@ -40,6 +46,7 @@ const Announcements: React.FC = () => {
     setBannerUrl('');
   };
 
+  // Função para abrir modal de edição com os dados do anúncio selecionado
   const handleEdit = (announcement: Announcement) => {
     setSelectedAnnouncement(announcement);
     methods.reset(announcement);
@@ -47,11 +54,13 @@ const Announcements: React.FC = () => {
     setEditModalOpen(true);
   };
 
+  // Função para abrir modal de visualização com os dados do anúncio selecionado
   const handleView = (announcement: Announcement) => {
     setSelectedAnnouncement(announcement);
     setViewModalOpen(true);
   };
 
+  // Função para lidar com mudança de arquivo no formulário
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -60,6 +69,7 @@ const Announcements: React.FC = () => {
     }
   };
 
+  // Função para submeter dados do formulário de edição
   const onSubmit: SubmitHandler<Announcement> = async (formData) => {
     try {
       const dataToSend = new FormData();
@@ -90,6 +100,7 @@ const Announcements: React.FC = () => {
     }
   };
 
+  // Função para deletar um anúncio
   const onDelete = async (id: number) => {
     if (window.confirm('Tem certeza que deseja deletar este Comunicado?')) {
       try {
@@ -103,6 +114,7 @@ const Announcements: React.FC = () => {
     }
   };
 
+  // Função para lidar com edição de células na tabela
   const handleEditCellChangeCommitted = (params: any) => {
     const { id, field, value } = params;
     setEditedRows((prev) => {
@@ -115,6 +127,8 @@ const Announcements: React.FC = () => {
     });
     console.log(editedRows);
   };
+
+ 
 
   return (
     <div>
@@ -133,16 +147,21 @@ const Announcements: React.FC = () => {
         />
       </div>
       {/* Tabela de Dados */}
-      <DataTable
-         data={data as GridValidRowModel[]}
-        columns={tableConfigs.announcements.columns}
-        loading={loading}
-        onEdit={handleEdit}
-        onView={handleView}
-        onDelete={onDelete}
-        
-      />
-
+      {loading ? (
+        <CircularProgress />
+      ) : error ? (
+        <div>Error: {error.message}</div>
+      ) : (
+        // Tabela de dados
+        <DataTable
+          data={data ?? []}
+          columns={tableConfigs.announcements.columns}
+          loading={loading}
+          onEdit={handleEdit}
+          onView={handleView}
+          onDelete={onDelete}
+        />
+      )}
       {/* Modal de Visualização */}
       <GenericModal
         open={viewModalOpen}
@@ -182,7 +201,7 @@ const Announcements: React.FC = () => {
         )}
       </GenericModal>
     </div>
-  );  
+  );
 };
 
 export default Announcements;

@@ -11,6 +11,9 @@
     "outDir": "./dist",
     "esModuleInterop": true
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "typings"
+  ],
   "exclude": ["node_modules", "dist"]
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios, { AxiosError } from 'axios';
 
 interface FetchDataResponse<T> {
@@ -40,4 +40,5 @@ function useFetchData<T>(url: string): FetchDataResponse<T> {
     refetchData: fetchData,
   };
 }
-export default useFetchData
+
+export default useFetchData;

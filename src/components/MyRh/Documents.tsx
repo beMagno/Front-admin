@@ -10,6 +10,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import CreateButton from '../CreateButton';
 import { GridValidRowModel } from '@mui/x-data-grid';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 interface Document  {
   id: number;
@@ -100,15 +102,22 @@ const Documents = () => {
           refetchData={refetchData} 
         />
       </div>
-      {/* Tabela de Dados */}
-      <DataTable
-        data={data as GridValidRowModel[]}
-        columns={tableConfigs.documents.columns}
-        loading={loading}
-        onEdit={handleEdit}
-        onView={handleView}
-        onDelete={onDelete} 
-      />
+      
+      {loading ? (
+        <CircularProgress />
+      ) : error ? (
+        <div>Error: {error.message}</div>
+      ) : (
+        // Tabela de dados
+        <DataTable
+          data={(data ?? []) as GridValidRowModel[]}
+          columns={tableConfigs.documents.columns}
+          loading={loading}
+          onEdit={handleEdit}
+          onView={handleView}
+          onDelete={onDelete} 
+        />
+      )}
 
       {/* Modal de Visualização */}
       <GenericModal

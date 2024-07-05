@@ -1,16 +1,14 @@
 import styled from 'styled-components';
 
 export const SidebarContainer = styled.div`
-  width: 200px;
-  height: 85vh;
-  background-color: #f4f4f4;
-  border-radius: 20px;
+  width: 240px; 
+  height: 100vh; 
+  background-color: #ffffff;
   padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 1px -1px, rgba(0, 0, 0, 0.14) 0px 1px 1px 0px, rgba(0, 0, 0, 0.12) 0px 1px 3px 0px;
   position: fixed;
-  margin-left: 20px;
-  margin-top: 10px;
-  margin-bottom: 40px;
+  left: 0; 
+  top: 0; 
 `;
 
 export const LogoContainer = styled.div`
@@ -19,26 +17,34 @@ export const LogoContainer = styled.div`
   width: 100%;
   margin-bottom: 20px;
 
-  .logo{
+  .logo {
     width: 150px;
     margin-bottom: 20px;
-    
   }
 `;
 
 export const SidebarLink = styled.div`
-  display: flex;
-  margin: 20px 0;
-  color: #333;
-  text-decoration: none;
-  font-size: 20px;
-  gap: 10px;
-
-  align-items: center;
+    display: flex;
+    margin: 20px 0;
+    color: #697790;
+    text-decoration: none;
+    font-size: 20px;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 8px;
 
   &:hover {
-    text-decoration: underline;
     font-weight: 500;
+    color: #00e37c; 
+    background-color: #e8f5e9; 
+    cursor: pointer;
+  }
+
+  &.active {
+    background-color: #04E47C; 
+    color: #fff; 
+    font-weight: bold; 
   }
 `;
 
@@ -56,14 +62,12 @@ export const ButtonLink = styled.button`
   font-size: 16px;
   gap: 20px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  transition: .3s;
+  transition: 0.3s;
   margin-top: 20px;
 
-  &:hover{
-    background: #00022F;
-    color: #fff;
+  &:hover {
+    background: #4caf50; /* Cor de fundo ao passar o mouse */
+    color: #fff; /* Cor do texto ao passar o mouse */
+    cursor: pointer;
   }
-`
-
-
-
+`;
