@@ -10,6 +10,7 @@ interface Config {
   faq: TableConfig;
   benefits: TableConfig;
   documents: TableConfig;
+  notifications: TableConfig;
   // Adicione outras configurações conforme necessário
 }
 
@@ -47,6 +48,15 @@ const tableConfigs: Config = {
       { field: 'title', headerName: 'Título', width: 200 },
       { field: 'description', headerName: 'Descrição', width: 400 },
       { field: 'employment_type', headerName: 'Tipo' },
+    ],
+  },
+  notifications: {
+    apiUrl: "https://portal-dev.teclat.dev/api/notification/",
+    columns: [
+      { field: 'title', headerName: 'Título', width: 200 },
+      { field: 'post_date', headerName: 'Data de Postagem', width: 150 },
+      { field: 'exclusion_date', headerName: 'Data de Exclusão', width: 150 },
+      { field: 'Worker_type', headerName: 'Tipo' },
     ],
   },
   // Adicione outras configurações conforme necessário

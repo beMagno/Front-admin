@@ -6,6 +6,7 @@ import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
 import HelpCenterOutlinedIcon from '@mui/icons-material/HelpCenterOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import Logo from "../../assets/Logo.png";
 
 
@@ -41,6 +42,10 @@ const Sidebar: React.FC = () => {
       <SidebarLink as={Link} to="/meurh" className={currentPage === '/meurh' ? 'active' : ''}>
         <DescriptionOutlinedIcon sx={iconStyle} />
         Meu RH
+      </SidebarLink>
+      <SidebarLink as={Link} to="/notificacoes" className={currentPage === '/notificacoes' ? 'active' : ''}>
+        <NotificationsOutlinedIcon sx={iconStyle} />
+        Notificações
       </SidebarLink>
       <SidebarLink as={Link} to="/login" className={currentPage === '/login' ? 'active' : ''}>
         <LoginOutlinedIcon sx={iconStyle} />

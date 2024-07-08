@@ -1,7 +1,7 @@
 interface FieldConfig {
     id: string;
     label: string;
-    type: 'text' | 'textarea' | 'select' | 'checkbox' | 'file'; // Tipos possíveis
+    type: 'text' | 'textarea' | 'select' | 'checkbox' | 'file' | 'date'; // Tipos possíveis
     required: boolean;
     options?: { value: string; label: string }[]; // Apenas se o type for 'select'
 }
@@ -26,6 +26,8 @@ const formConfigs: Record<string, FormConfig> = {
                 { value: 'INATIVO', label: 'Inativo' }
             ], required: true },
             { id: 'banner', label: 'Banner', type: 'file', required: false },
+            { id: 'post_date', label: 'Data de Postagem', type: 'date', required: true },
+            { id: 'exclusion_date', label: 'Data de Exclusão', type: 'date', required: true }
         ],
     },
     faq: {
@@ -54,6 +56,19 @@ const formConfigs: Record<string, FormConfig> = {
                 { value: 'PJ', label: 'PJ' }
             ], required: true },
             { id: 'file', label: 'Arquivo', type: 'file', required: false },
+        ],
+    },
+    notifications: {
+        fields: [
+            { id: 'title', label: 'Título', type: 'text', required: true },
+            { id: 'message', label: 'Mensagem', type: 'textarea', required: true },
+            { id: 'Worker_type', label: 'Tipo', type: 'select', options: [
+                { value: 'CLT', label: 'CLT' },
+                { value: 'PJ', label: 'PJ' }
+            ], required: true },
+            { id: 'post_date', label: 'Data de Postagem', type: 'date', required: true },
+            { id: 'exclusion_date', label: 'Data de Exclusão', type: 'date', required: true }
+            
         ],
     },
     // Outras configurações de formulário...

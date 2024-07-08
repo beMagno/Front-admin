@@ -15,7 +15,7 @@ interface FieldOption {
 interface FieldConfig {
   id: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'checkbox' | 'file';
+  type: 'text' | 'textarea' | 'select' | 'checkbox' | 'file' | 'date';
   required?: boolean;
   options?: FieldOption[];
 }
@@ -31,9 +31,8 @@ interface GenericFormProps {
 }
 
 const GenericForm: React.FC<GenericFormProps> = ({ config, values, handleFileChange }) => {
-
-  console.log("handleFileChange prop:", handleFileChange);
-  const { control, setValue, formState: { errors } } = useFormContext();
+  const { control, setValue, formState: { errors }, getValues } = useFormContext();
+  
   const handleQuillChange = (id: string, value: string) => {
     setValue(id, value);
   };
@@ -54,7 +53,7 @@ const GenericForm: React.FC<GenericFormProps> = ({ config, values, handleFileCha
                     {...controllerField}
                     label={field.label}
                     error={!!errors[field.id]}
-                    helperText={errors[field.id] && `${field.label} é obrigatório`}
+                    helperText={errors[field.id]?.message || `${field.label} é obrigatório`}
                     variant="outlined"
                     fullWidth
                     margin="normal"
@@ -92,7 +91,7 @@ const GenericForm: React.FC<GenericFormProps> = ({ config, values, handleFileCha
                     fullWidth
                     margin="normal"
                   >
-                    {field.options && field.options.map((option) => (
+                    {field.options?.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
                       </MenuItem>
@@ -137,6 +136,56 @@ const GenericForm: React.FC<GenericFormProps> = ({ config, values, handleFileCha
                       }
                       controllerField.onChange(e.target.files?.[0]);
                     }}
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    InputLabelProps={{ shrink: true }}
+                  />
+                )}
+              />
+            );
+          case 'date':
+            return (
+              <Controller
+                key={field.id}
+                name={field.id}
+                control={control}
+                rules={{
+                  required: field.required,
+                  validate: (value) => {
+                    if (!value) return true;
+
+                    if (field.id === 'post_date') {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const postDate = new Date(value);
+                      postDate.setHours(0, 0, 0, 0);
+                      if (postDate < today) {
+                        return 'Data de Postagem não pode ser antes de hoje';
+                      }
+                    }
+                    if (field.id === 'exclusion_date') {
+                      const postDateValue = getValues('post_date');
+                      if (!postDateValue) return true;
+
+                      const postDate = new Date(postDateValue);
+                      postDate.setHours(0, 0, 0, 0);
+                      const exclusionDate = new Date(value);
+                      exclusionDate.setHours(0, 0, 0, 0);
+                      if (exclusionDate < postDate) {
+                        return 'Data de Exclusão não pode ser antes da Data de Postagem';
+                      }
+                    }
+                    return true;
+                  }
+                }}
+                render={({ field: controllerField }) => (
+                  <TextField
+                    {...controllerField}
+                    type="date"
+                    label={field.label}
+                    error={!!errors[field.id]}
+                    helperText={errors[field.id]?.message}
                     variant="outlined"
                     fullWidth
                     margin="normal"

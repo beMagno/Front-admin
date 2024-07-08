@@ -11,6 +11,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Login from './pages/Login';
 import Topbar from './components/Topbar';
+import Notifications from './pages/Notification';
 
 const AppContainer = styled.div`
   display: flex;
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="/comunicados" element={<Announcements />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/meurh" element={<MyRh />} />
+            <Route path="/notificacoes" element={<Notifications />} />
             <Route path="/login" element={<Login />} />
           </Routes>
         </Content>
