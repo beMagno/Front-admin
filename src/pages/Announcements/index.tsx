@@ -3,13 +3,13 @@ import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
 import DataTable from '../../components/DataTable';
 import GenericModal from '../../components/Modals/GenericModal';
 import GenericForm from '../../components/Forms/GenericForm';
-import tableConfigs from '../../components/DataTable/DataTableConfig';
+import tableConfigs from '../../components/DataTable/DataTableConfig';  
 import formConfigs from '../../components/Forms/FormConfig';
 import useFetchData from '../../hooks/useFetchData';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { PageContainer, CreateButtonContainer, LoadingContainer, DataTableContainer, ModalContent } from './style';
 import CreateButton from '../../components/CreateButton/index';
-import SaveButton from '../../components/SaveButton';
 import CircularProgress from '@mui/material/CircularProgress'
 import { GridValidRowModel } from '@mui/x-data-grid';
 
@@ -131,65 +131,56 @@ const Announcements: React.FC = () => {
  
 
   return (
-    <div>
-      <h1>Comunicados</h1>
-      <div style={{ display: "flex", flexDirection: "row", gap: 30, marginBottom: 20, marginTop: 20 }}>
-        <SaveButton
-          editedRows={editedRows}
-          apiUrl={tableConfigs.announcements.apiUrl}
-          refetchData={refetchData}
-        />
+    <PageContainer>
+      <CreateButtonContainer>
         <CreateButton
           title="Novo Comunicado"
           config={formConfigs.announcements}
           apiUrl={tableConfigs.announcements.apiUrl}
           refetchData={refetchData}
         />
-      </div>
-      {/* Tabela de Dados */}
+      </CreateButtonContainer>
       {loading ? (
-        <CircularProgress />
+        <LoadingContainer>
+          <CircularProgress />
+        </LoadingContainer>
       ) : error ? (
         <div>Error: {error.message}</div>
       ) : (
-        // Tabela de dados
-        <DataTable
-          data={data ?? []}
-          columns={tableConfigs.announcements.columns}
-          loading={loading}
-          onEdit={handleEdit}
-          onView={handleView}
-          onDelete={onDelete}
-        />
+        <DataTableContainer>
+          <DataTable
+            data={data ?? []}
+            columns={tableConfigs.announcements.columns}
+            loading={loading}
+            onEdit={handleEdit}
+            onView={handleView}
+            onDelete={onDelete}
+          />
+        </DataTableContainer>
       )}
-      {/* Modal de Visualização */}
       <GenericModal
         open={viewModalOpen}
         handleClose={handleCloseModals}
         title="Visualizar Comunicado"
       >
-        {/* Conteúdo do modal de visualização */}
         {selectedAnnouncement && (
-          <div>
+          <ModalContent>
             <p><strong>Título:</strong> {selectedAnnouncement?.title}</p>
             <p><strong>Descrição:</strong> {selectedAnnouncement?.description}</p>
-            <p><strong>Mensagem:</strong> <span style={{ maxWidth: '100%', height: 'auto', display: 'block' }} dangerouslySetInnerHTML={{ __html: selectedAnnouncement?.message }} /></p>
+            <p><strong>Mensagem:</strong> <span dangerouslySetInnerHTML={{ __html: selectedAnnouncement?.message }} /></p>
             <p><strong>Tipo:</strong> {selectedAnnouncement?.announcement_type}</p>
             <p><strong>Fixar:</strong> {selectedAnnouncement?.pin ? 'Sim' : 'Não'}</p>
             <p><strong>Status:</strong> {selectedAnnouncement?.status}</p>
-            <p><strong>Banner:</strong> <img src={selectedAnnouncement?.Banner} alt="Banner" style={{ maxWidth: '100%', height: 'auto' }} /></p>
-          </div>
+            <p><strong>Banner:</strong> <img src={selectedAnnouncement?.Banner} alt="Banner" /></p>
+          </ModalContent>
         )}
       </GenericModal>
-
-      {/* Modal de Edição */}
       <GenericModal
         open={editModalOpen}
         handleClose={handleCloseModals}
         title="Editar Comunicado"
         handleSave={methods.handleSubmit(onSubmit)}
       >
-        {/* Formulário de edição */}
         {selectedAnnouncement && (
           <FormProvider {...methods}>
             <GenericForm
@@ -200,7 +191,7 @@ const Announcements: React.FC = () => {
           </FormProvider>
         )}
       </GenericModal>
-    </div>
+    </PageContainer>
   );
 };
 

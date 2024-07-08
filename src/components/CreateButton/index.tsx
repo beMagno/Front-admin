@@ -66,7 +66,7 @@ const CreateButton: React.FC<CreateButtonProps> = ({ title, config, apiUrl, refe
     <>
       <Button
         variant="contained"
-        color="primary"
+        color="secondary"
         startIcon={<AddIcon />}
         onClick={handleOpenModal}
       >

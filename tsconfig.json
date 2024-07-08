@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["@mui/lab"],
     "target": "ES6",
     "module": "commonjs",
     "strict": true,

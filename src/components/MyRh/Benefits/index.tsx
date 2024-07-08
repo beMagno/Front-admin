@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useForm, FormProvider, SubmitHandler, FieldValues } from 'react-hook-form';
-import DataTable from '../DataTable';
-import GenericModal from '../Modals/GenericModal';
-import GenericForm from '../Forms/GenericForm';
-import tableConfigs from '../DataTable/DataTableConfig';
-import formConfigs from '../Forms/FormConfig';
-import useFetchData from '../../hooks/useFetchData';
+import DataTable from '../../DataTable';
+import GenericModal from '../../Modals/GenericModal';
+import GenericForm from '../../Forms/GenericForm';
+import tableConfigs from '../../DataTable/DataTableConfig';
+import formConfigs from '../../Forms/FormConfig';
+import useFetchData from '../../../hooks/useFetchData';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import CreateButton from '../CreateButton/index';
+import CreateButton from '../../CreateButton/index';
 import { GridValidRowModel } from '@mui/x-data-grid';
+import { PageContainer, CreateButtonContainer, LoadingContainer, DataTableContainer, ModalContent } from './style';
 import CircularProgress from '@mui/material/CircularProgress';
 
 
@@ -100,30 +101,33 @@ const Benefits: React.FC  = () => {
 
 
   return (
-    <div>
-      <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", marginBottom:40}}>
-        <h2>Benefícios</h2>
+    <PageContainer>
+      <CreateButtonContainer>
         <CreateButton 
           title="Novo Benefício" 
           config={formConfigs.benefits} 
           apiUrl={tableConfigs.benefits.apiUrl}
           refetchData={refetchData} 
         />
-      </div>
+      </CreateButtonContainer>
       {loading ? (
-        <CircularProgress />
+        <LoadingContainer>
+          <CircularProgress />
+        </LoadingContainer>
       ) : error ? (
         <div>Error: {error.message}</div>
       ) : (
         // Tabela de dados
-        <DataTable
-          data={(data ?? []) as GridValidRowModel[]}
-          columns={tableConfigs.benefits.columns}
-          loading={loading}
-          onEdit={handleEdit}
-          onView={handleView}
-          onDelete={onDelete} 
-        />
+        <DataTableContainer>
+          <DataTable
+            data={(data ?? []) as GridValidRowModel[]}
+            columns={tableConfigs.benefits.columns}
+            loading={loading}
+            onEdit={handleEdit}
+            onView={handleView}
+            onDelete={onDelete} 
+          />
+        </DataTableContainer>
       )}
 
       {/* Modal de Visualização */}
@@ -134,11 +138,11 @@ const Benefits: React.FC  = () => {
       >
         {/* Conteúdo do modal de visualização */}
         {selectedBenefit &&(
-          <div>
+          <ModalContent>
             <p><strong>Nome:</strong> {selectedBenefit?.name}</p>
             <p><strong>Descrição:</strong> {selectedBenefit?.description}</p>
             <p><strong>Banner:</strong> <img src={selectedBenefit?.banner} alt="Banner" style={{ maxWidth: '100%', height: 'auto' }} /></p>
-          </div>
+          </ModalContent>
         )}
       </GenericModal>
 
@@ -160,7 +164,7 @@ const Benefits: React.FC  = () => {
         </FormProvider>
         )}
       </GenericModal>
-    </div>
+    </PageContainer>
   );
 };
 

@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useForm, FormProvider, SubmitHandler, FieldValues } from 'react-hook-form';
-import DataTable from '../DataTable';
-import GenericModal from '../Modals/GenericModal';
-import GenericForm from '../Forms/GenericForm';
-import tableConfigs from '../DataTable/DataTableConfig';
-import formConfigs from '../Forms/FormConfig';
-import useFetchData from '../../hooks/useFetchData';
+import DataTable from '../../DataTable';
+import GenericModal from '../../Modals/GenericModal';
+import GenericForm from '../../Forms/GenericForm';
+import tableConfigs from '../../DataTable/DataTableConfig';
+import formConfigs from '../../Forms/FormConfig';
+import useFetchData from '../../../hooks/useFetchData';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import CreateButton from '../CreateButton';
+import CreateButton from '../../CreateButton';
 import { GridValidRowModel } from '@mui/x-data-grid';
 import CircularProgress from '@mui/material/CircularProgress';
+import { PageContainer, CreateButtonContainer, LoadingContainer, DataTableContainer, ModalContent } from './style';
+
 
 
 interface Document  {
@@ -92,31 +94,34 @@ const Documents = () => {
 
 
   return (
-    <div>
-      <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", marginBottom:40, marginTop:40}}>
-        <h2>Documentos</h2>
+    <PageContainer>
+      <CreateButtonContainer>
         <CreateButton 
           title="Novo Documento" 
           config={formConfigs.documents} 
           apiUrl={tableConfigs.documents.apiUrl}
           refetchData={refetchData} 
         />
-      </div>
+      </CreateButtonContainer>
       
       {loading ? (
-        <CircularProgress />
+        <LoadingContainer>
+          <CircularProgress />
+        </LoadingContainer>
       ) : error ? (
         <div>Error: {error.message}</div>
       ) : (
         // Tabela de dados
-        <DataTable
-          data={(data ?? []) as GridValidRowModel[]}
-          columns={tableConfigs.documents.columns}
-          loading={loading}
-          onEdit={handleEdit}
-          onView={handleView}
-          onDelete={onDelete} 
-        />
+        <DataTableContainer>
+            <DataTable
+              data={(data ?? []) as GridValidRowModel[]}
+              columns={tableConfigs.documents.columns}
+              loading={loading}
+              onEdit={handleEdit}
+              onView={handleView}
+              onDelete={onDelete} 
+            />
+        </DataTableContainer>
       )}
 
       {/* Modal de Visualização */}
@@ -127,12 +132,12 @@ const Documents = () => {
       >
         {/* Conteúdo do modal de visualização */}
         {selectedDocument &&(
-          <div>
+          <ModalContent>
             <p><strong>Título:</strong> {selectedDocument?.title}</p>
             <p><strong>Descrição:</strong> {selectedDocument?.description}</p>
             <p><strong>Tipo:</strong> {selectedDocument.employment_type}</p>
             <p><strong>Arquivo:</strong> {selectedDocument?.file}</p>
-          </div>
+          </ModalContent>
         )}
       </GenericModal>
 
@@ -153,7 +158,7 @@ const Documents = () => {
         </FormProvider>
         )}
       </GenericModal>
-    </div>
+    </PageContainer>
   );
 };
 

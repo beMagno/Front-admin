@@ -27,7 +27,7 @@ const Sidebar: React.FC = () => {
         <img src={Logo} alt="Logo" className="logo" />
       </LogoContainer>
       <SidebarLink as={Link} to="/" className={currentPage === '/' ? 'active' : ''}>
-        <DashboardOutlinedIcon sx={iconStyle} />
+        <DashboardOutlinedIcon className='icons' />
         Dashboard
       </SidebarLink>
       <SidebarLink as={Link} to="/comunicados" className={currentPage === '/comunicados' ? 'active' : ''}>

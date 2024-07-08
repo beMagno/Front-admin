@@ -38,10 +38,10 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns, loading, onEdit, o
       disableColumnMenu: true,
       renderCell: (params: GridCellParams) => (
         <div>
-          <IconButton color="primary" onClick={() => handleViewClick(params.row)} aria-label="view">
+          <IconButton color="secondary" onClick={() => handleViewClick(params.row)} aria-label="view">
             <VisibilityIcon />
           </IconButton>
-          <IconButton color="primary" onClick={() => handleEditClick(params.row)} aria-label="edit">
+          <IconButton color="secondary" onClick={() => handleEditClick(params.row)} aria-label="edit">
             <EditIcon />
           </IconButton>
           <IconButton color="error" onClick={() => handleDeleteClick(params.row)} aria-label="delete">
@@ -53,7 +53,7 @@ const DataTable: React.FC<DataTableProps> = ({ data, columns, loading, onEdit, o
   ];
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <div style={{ width: '100%' }}>
       <DataGrid
         rows={data}
         columns={columnsWithActions}

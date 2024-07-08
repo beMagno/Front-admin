@@ -10,6 +10,7 @@ import axios from 'axios';
 import CreateButton from '../../components/CreateButton';
 import { toast } from 'react-toastify';
 import { GridValidRowModel } from '@mui/x-data-grid';
+import { PageContainer, CreateButtonContainer, LoadingContainer, DataTableContainer, ModalContent } from './style';
 import CircularProgress from '@mui/material/CircularProgress';
 
 interface Faq {
@@ -96,31 +97,34 @@ const FAQ: React.FC = () => {
   };
 
   return (
-    <div>
-      <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", marginBottom:40}}>
-        <h1>FAQ</h1>
+    <PageContainer>
+      <CreateButtonContainer>
         <CreateButton 
           title="Nova Pergunta" 
           config={formConfigs.faq} 
           apiUrl={tableConfigs.faq.apiUrl}
           refetchData={refetchData} 
         />
-      </div>
+      </CreateButtonContainer>
 
       {loading ? (
-        <CircularProgress />
+        <LoadingContainer>
+          <CircularProgress />
+        </LoadingContainer>
       ) : error ? (
         <div>Error: {error.message}</div>
       ) : (
         // Tabela de dados
-        <DataTable
-          data={(data ?? []) as GridValidRowModel[]}
-          columns={tableConfigs.faq.columns}
-          loading={loading}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={onDelete}
-        />
+        <DataTableContainer>
+            <DataTable
+              data={(data ?? []) as GridValidRowModel[]}
+              columns={tableConfigs.faq.columns}
+              loading={loading}
+              onView={handleView}
+              onEdit={handleEdit}
+              onDelete={onDelete}
+            />
+        </DataTableContainer>
       )}
       {/* Modal de Visualização */}
       <GenericModal
@@ -130,11 +134,11 @@ const FAQ: React.FC = () => {
       >
         {/* Conteúdo do modal de visualização */}
         {selectedFAQ && (
-          <div>
+          <ModalContent>
             <p><strong>Pergunta:</strong> {selectedFAQ.question}</p>
             <p><strong>Resposta:</strong> {selectedFAQ.answer}</p>
             <p><strong>Tipo:</strong> {selectedFAQ.employment_type}</p>
-          </div>
+          </ModalContent>
         )}
       </GenericModal>
 
@@ -155,7 +159,7 @@ const FAQ: React.FC = () => {
           </FormProvider>
         )}
       </GenericModal>
-    </div>
+    </PageContainer>
   );
 };
 

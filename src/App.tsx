@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
 import Announcements from './pages/Announcements';
 import Sidebar from './components/Sidebar';
 import styled from 'styled-components';
@@ -33,7 +33,7 @@ const App = () => {
         <Topbar />
         <Content>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/comunicados" element={<Announcements />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/meurh" element={<MyRh />} />

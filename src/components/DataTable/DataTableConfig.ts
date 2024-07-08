@@ -19,10 +19,10 @@ const tableConfigs: Config = {
     columns: [
       { field: 'title', headerName: 'Título', width: 200 },
       { field: 'announcement_type', headerName: 'Tipo', width: 120 },
-      { field: 'pin', headerName: 'Fixar', type: 'boolean', editable: true },
+      { field: 'pin', headerName: 'Fixar', type: 'boolean',  },
       { field: 'post_date', headerName: 'Data de Postagem', width: 150 },
       { field: 'exclusion_date', headerName: 'Data de Exclusão', width: 150 },
-      { field: 'status', headerName: 'Status', editable: true },
+      { field: 'status', headerName: 'Status', },
     ],
   },
   faq: {
